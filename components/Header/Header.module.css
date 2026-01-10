@@ -1,0 +1,31 @@
+.header {
+    padding: 28px 0;
+}
+
+.inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.logoDark {
+    color: #111;
+}
+
+.logoLight {
+    color: #6c757d;
+}
+
+.nav {
+    display: flex;
+    gap: 32px;
+}
+
+.link {
+    font-size: 16px;
+}

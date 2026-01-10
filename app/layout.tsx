@@ -1,10 +1,5 @@
-import type { Metadata } from 'next';
 import './globals.css';
-
-export const metadata: Metadata = {
-  title: 'TravelTrucks',
-  description: 'Camper rental service',
-};
+import Header from '@/components/Header/Header';
 
 export default function RootLayout({
   children,
@@ -14,7 +9,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* Header додамо пізніше */}
+        <Header />
         <main>{children}</main>
       </body>
     </html>
