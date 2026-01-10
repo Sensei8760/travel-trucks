@@ -4,7 +4,7 @@ import styles from './Hero.module.css';
 export default function Hero() {
   return (
     <section className={styles.hero}>
-      <div className={`container ${styles.content}`}>
+      <div className={styles.inner}>
         <h1 className={styles.title}>Campers of your dreams</h1>
         <p className={styles.text}>
           You can find everything you want in our catalog

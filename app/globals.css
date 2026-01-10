@@ -22,6 +22,8 @@ body {
   background-color: #ffffff;
   color: #111111;
   line-height: 1.5;
+  display: flex;
+    flex-direction: column
 }
 
 /* ===== Links ===== */
@@ -55,4 +57,17 @@ ol {
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 64px;
+}
+/* html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+} */
+
+.main {
+  flex: 1;
 }
