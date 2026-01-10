@@ -1,31 +1,43 @@
 .header {
-    padding: 28px 0;
+    background-color: #fff;
 }
 
 .inner {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    padding: 28px 0;
 }
 
+/* ===== Logo ===== */
 .logo {
+    margin-left: 64px;
     font-size: 20px;
     font-weight: 700;
 }
 
 .logoDark {
-    color: #111;
+    color: #111111;
 }
 
 .logoLight {
     color: #6c757d;
 }
 
+/* ===== Navigation ===== */
 .nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     gap: 32px;
 }
 
 .link {
     font-size: 16px;
+    color: #111111;
+}
+
+.active {
+    color: #e44848;
 }
