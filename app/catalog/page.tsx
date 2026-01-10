@@ -4,11 +4,16 @@ import styles from './CatalogPage.module.css';
 
 export default function CatalogPage() {
   return (
-    <section className={styles.catalog}>
-      <div className={styles.layout}>
-        <Filters />
-        <CampersList />
+    <main className={styles.page}>
+      <div className={styles.container}>
+        <aside className={styles.sidebar}>
+          <Filters />
+        </aside>
+
+        <section className={styles.content}>
+          <CampersList />
+        </section>
       </div>
-    </section>
+    </main>
   );
 }

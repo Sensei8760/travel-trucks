@@ -1,5 +1,4 @@
-import api from './api';
-import { Camper } from '@/types/camper';
+import type { Camper } from '@/types/camper';
 
 export interface FetchCampersParams {
   page?: number;
@@ -9,19 +8,31 @@ export interface FetchCampersParams {
   AC?: boolean;
   kitchen?: boolean;
   TV?: boolean;
-  radio?: boolean;
   bathroom?: boolean;
 }
 
-export const fetchCampers = async (params: FetchCampersParams) => {
-  const { data } = await api.get<Camper[]>('/campers', {
-    params,
+const buildQuery = (params: FetchCampersParams) => {
+  const query = new URLSearchParams();
+
+  Object.entries(params).forEach(([k, v]) => {
+    if (v === undefined) return;
+    if (typeof v === 'string' && v.trim() === '') return;
+    if (typeof v === 'boolean' && v === false) return;
+    query.set(k, String(v));
   });
 
-  return data;
+  return query.toString();
 };
 
-export const fetchCamperById = async (id: string) => {
-  const { data } = await api.get<Camper>(`/campers/${id}`);
-  return data;
+export const fetchCampers = async (params: FetchCampersParams): Promise<Camper[]> => {
+  const qs = buildQuery(params);
+
+  const res = await fetch(`/api/campers?${qs}`);
+  if (!res.ok) throw new Error(`Failed to fetch campers (status ${res.status})`);
+
+  const data = await res.json();
+
+  // ✅ підтримка обох форматів
+  if (Array.isArray(data)) return data;
+  return data.items ?? [];
 };

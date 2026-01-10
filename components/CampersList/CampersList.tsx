@@ -1,15 +1,34 @@
-import CamperCard from '../CamperCard/CamperCard';
+'use client';
+
+import { useEffect } from 'react';
+import CamperCard from '@/components/CamperCard/CamperCard';
+import { useCampersStore } from '@/store/campersStore';
 import styles from './CampersList.module.css';
 
 export default function CampersList() {
-  return (
-    <div className={styles.list}>
-      <CamperCard />
-      <CamperCard />
-      <CamperCard />
-      <CamperCard />
+  const { campers, isLoading, getCampers } = useCampersStore();
 
-      <button className={styles.loadMore}>Load more</button>
+  useEffect(() => {
+    getCampers(true);
+  }, [getCampers]);
+
+  return (
+    <div className={styles.wrapper}>
+      <ul className={styles.list}>
+        {campers.map((camper) => (
+          <li key={camper.id} className={styles.item}>
+            <CamperCard camper={camper} />
+          </li>
+        ))}
+      </ul>
+
+      {!isLoading && campers.length > 0 && (
+        <button className={styles.loadMore} onClick={() => getCampers()}>
+          Load more
+        </button>
+      )}
+
+      {isLoading && <p>Loading...</p>}
     </div>
   );
 }

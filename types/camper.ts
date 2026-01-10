@@ -11,25 +11,13 @@ export interface Camper {
   rating: number;
   location: string;
   description: string;
-  images: string[];
+  gallery: { thumb: string; original: string }[];
   reviews: Review[];
 
   transmission?: string;
   engine?: string;
   AC?: boolean;
-  bathroom?: boolean;
   kitchen?: boolean;
   TV?: boolean;
-  radio?: boolean;
-  refrigerator?: boolean;
-  microwave?: boolean;
-  gas?: boolean;
-  water?: boolean;
-
-  form?: string;
-  length?: string;
-  width?: string;
-  height?: string;
-  tank?: string;
-  consumption?: string;
+  bathroom?: boolean;
 }
