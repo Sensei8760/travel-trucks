@@ -1,0 +1,12 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.loadMore {
+    align-self: center;
+    margin-top: 24px;
+    padding: 12px 32px;
+    border-radius: 200px;
+}

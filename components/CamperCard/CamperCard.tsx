@@ -3,25 +3,38 @@ import styles from './CamperCard.module.css';
 export default function CamperCard() {
   return (
     <article className={styles.card}>
-      <img src="/images/camper.jpg" alt="" />
+      <img
+        className={styles.image}
+        src="/images/camper.jpg"
+        alt="Camper"
+      />
 
-      <div className={styles.info}>
+      <div className={styles.content}>
         <div className={styles.header}>
-          <h3>Mavericks</h3>
-          <span>€8000.00</span>
+          <h3 className={styles.title}>Mavericks</h3>
+          <span className={styles.price}>€8000.00</span>
         </div>
 
-        <p className={styles.meta}>⭐ 4.4 (2 Reviews) • Kyiv, Ukraine</p>
-        <p className={styles.desc}>
+        <p className={styles.meta}>
+          <svg className={styles.star} aria-hidden="true">
+            <use href="/icons/sprite.svg#icon-Property-1Default-1" />
+          </svg>
+          <span className={styles.rating}>4.4</span>
+          <span className={styles.reviews}>(2 Reviews)</span>
+          <span className={styles.dot}>•</span>
+          <span>Kyiv, Ukraine</span>
+        </p>
+
+        <p className={styles.description}>
           Embrace simplicity and freedom with the Mavericks panel truck...
         </p>
 
-        <div className={styles.tags}>
-          <span>Automatic</span>
-          <span>Petrol</span>
-          <span>Kitchen</span>
-          <span>AC</span>
-        </div>
+        <ul className={styles.features}>
+          <li>Automatic</li>
+          <li>Petrol</li>
+          <li>Kitchen</li>
+          <li>AC</li>
+        </ul>
 
         <button className={styles.more}>Show more</button>
       </div>
