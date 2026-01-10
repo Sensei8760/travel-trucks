@@ -1,5 +1,5 @@
 .header {
-    background-color: #fff;
+    background-color: var(--inputs);
 }
 
 .inner {
@@ -35,9 +35,11 @@
 
 .link {
     font-size: 16px;
-    color: #111111;
+    font-weight: 500;
+        line-height: 150%;
+    color: var(--main);
 }
 
 .active {
-    color: #e44848;
+    color: var(--button-hover);
 }

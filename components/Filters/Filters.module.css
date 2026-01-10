@@ -1,104 +1,145 @@
 .filters {
-    display: flex;
-    flex-direction: column;
     width: 100%;
-        max-width: 360px;
+    max-width: 360px;
 }
 
-/* ===== Sections ===== */
 .section {
-    margin-bottom: 32px;
+    margin-bottom: 40px;
 }
 
 .label {
-    font-size: 16px;
-    color: #6c757d;
+    display: block;
     margin-bottom: 8px;
-}
-
-/* ===== Location ===== */
-.location {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 14px 16px;
-    background-color: #f7f7f7;
-    border-radius: 10px;
     font-size: 16px;
-    color: #111111;
+    font-weight: 400;
+        line-height: 150%;
+        color: var(--gray);
+        
 }
 
-.icon {
-    width: 18px;
-    height: 18px;
-    fill: #6c757d;
+.locationField {
+    position: relative;
+    height: 48px;
 }
 
-/* ===== Filters title ===== */
+.locationIcon {
+    position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+    
+        color: var(--gray);
+        fill: currentColor;
+        stroke: currentColor;
+}
+
+.locationInput {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px 0 48px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--inputs);
+    outline: none;
+line-height: 150%;
+    font-size: 16px;
+    color: var(--main);
+}
+
+.locationInput::placeholder {
+    color: var(--gray);
+    /* empty state */
+}
+
+/* filled state — як на 2 скріні */
+.filled .locationIcon {
+    color: var(--main);
+}
+
+.filled .locationInput {
+    color: var(--main);
+}
+
 .filtersTitle {
+    margin: 40px 0 32px;
     font-size: 16px;
+    color: var(--text);
     font-weight: 500;
+        line-height: 150%;
+}
+
+.sectionTitle {
+    margin-bottom: 24px;
+    font-size: 20px;
+    font-weight: 600;
+        line-height: 120%;
+    color: var(--main);
+}
+
+.divider {
+    height: 1px;
+    background: var(--gray-light);
     margin-bottom: 24px;
 }
 
-/* ===== Section title ===== */
-.sectionTitle {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-
-/* ===== Divider ===== */
-.divider {
-    height: 1px;
-    background-color: #eaeaea;
-    margin-bottom: 16px;
-}
-
-/* ===== Options grid ===== */
 .grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(3, 112px);
+    row-gap: 8px;
+        column-gap: 12px;
 }
 
-/* ===== Option button ===== */
 .option {
+    height: 96px;
+    border-radius: 12px;
+    border: 1px solid var(--gray-light);
+    background: var(--white);
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 16px;
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    font-size: 14px;
-    color: #111111;
-    transition: border-color 0.2s ease;
+    color: var(--main);
 }
 
 .option svg {
-    width: 24px;
-    height: 24px;
-    fill: #111111;
+    width: 32px;
+    height: 32px;
+    color: var(--main);
 }
 
-/* Active option */
-.active {
-    border-color: #e44848;
-}
-
-.active svg {
-    fill: #e44848;
-}
-
-/* ===== Search button ===== */
-.search {
-    margin-top: 24px;
-    padding: 16px;
-    background-color: #e44848;
-    color: #ffffff;
-    border-radius: 200px;
+.option span {
     font-size: 16px;
     font-weight: 500;
+        line-height: 150%;
+        letter-spacing: -0.01em;
+}
+
+.active {
+    border-color: var(--button);
+}
+
+.search {
+    width: 166px;
+    height: 56px;
+    border: 0;
+    border-radius: 200px;
+    background: var(--button);
+    color: var(--white);
+    cursor: pointer;
+    font-weight: 500;
+        font-size: 16px;
+        line-height: 150%;
+        letter-spacing: -0.01em;
+    transition: background-color 200ms ease;
+}
+
+.search:hover {
+    background: var(--button-hover);
+}
+.section:nth-of-type(2) {
+    margin-bottom: 32px;
 }
