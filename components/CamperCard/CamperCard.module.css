@@ -83,13 +83,11 @@
     stroke-width: 2;
 }
 
-/* active: filled button */
 .favBtnActive .heartIcon {
     fill: var(--button);
     stroke: var(--button);
 }
 
-/* hover */
 .favBtn:hover .heartIcon {
     stroke: var(--button);
 }

@@ -24,7 +24,6 @@ const FORM_LABELS: Record<string, string> = {
   alcove: 'Alcove',
 };
 
-// ✅ 1:1 як у CamperCard
 const MIXED_ICON_IDS = new Set<string>([]);
 const FORCE_OUTLINE_ICON_IDS = new Set<string>([
   'icon-lucide_microwave',

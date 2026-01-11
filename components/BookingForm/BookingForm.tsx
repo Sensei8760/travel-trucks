@@ -97,7 +97,6 @@ export default function BookingForm() {
     setIsCalendarOpen(false);
   };
 
-  // close calendar on outside click (fix "open then close instantly")
   useEffect(() => {
     const onPointerDownCapture = (e: PointerEvent) => {
       if (!isCalendarOpen) return;
@@ -127,7 +126,6 @@ export default function BookingForm() {
     };
   }, []);
 
-  // hint inside Booking date field
   const isHintShown = isCalendarOpen && !selectedDate;
 
   const bookingValue = selectedDate
@@ -152,14 +150,12 @@ export default function BookingForm() {
       comment: comment.trim(),
     };
 
-    // ✅ лог у консоль (те, чого тобі не вистачало)
     console.log('[BookingForm] submit payload:', payload);
 
     try {
       setIsSubmitting(true);
 
-      // Тут буде реальний POST на бекенд, якщо він зʼявиться.
-      // Поки що — імітація запиту:
+
       await new Promise((r) => setTimeout(r, 500));
 
       showToast('success', 'Booking successful!');

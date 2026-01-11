@@ -10,7 +10,7 @@ type TabKey = 'features' | 'reviews';
 
 type Props = {
   camper: Camper;
-  aside?: React.ReactNode; // ✅ сюди передамо BookingForm
+  aside?: React.ReactNode; 
 };
 
 export default function CamperTabs({ camper, aside }: Props) {

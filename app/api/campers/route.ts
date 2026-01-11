@@ -95,13 +95,11 @@ export async function GET(request: Request) {
   const page = Math.max(1, Number(searchParams.get('page') ?? 1));
   const limit = Math.max(1, Number(searchParams.get('limit') ?? 4));
 
-  // фільтри без page/limit
   const filterParams = new URLSearchParams(searchParams);
   filterParams.delete('page');
   filterParams.delete('limit');
 
   try {
-    // Беремо "всі" з upstream, а фільтр/пагінацію робимо на бекенді (в цьому route)
     const { data } = await api.get('/campers', { params: { page: 1, limit: 1000 } });
 
     const allItems = normalizeItems(data);

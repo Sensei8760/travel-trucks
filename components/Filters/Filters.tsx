@@ -21,7 +21,6 @@ const capitalizeFirst = (s: string) => {
   return v.charAt(0).toUpperCase() + v.slice(1);
 };
 
-// дістає місто з будь-якого формату: "Ukraine, Kyiv" або "Kyiv, Ukraine" або "Kyiv"
 const extractCity = (raw: string) => {
   const s = cleanSpaces(raw);
   if (!s) return '';
@@ -38,7 +37,6 @@ const extractCity = (raw: string) => {
     return cleanSpaces(s.slice(0, s.length - DISPLAY_SUFFIX.length));
   }
 
-  // "Kyiv, something" -> беремо першу частину
   if (s.includes(',')) return cleanSpaces(s.split(',')[0]);
 
   return s;
@@ -75,21 +73,20 @@ export default function Filters() {
   const [cityDraft, setCityDraft] = useState('');
 
   const displayValue = useMemo(() => {
-    if (isLocFocused) return cityDraft; // тільки місто
-    return toDisplayLocation(location); // "Kyiv, Ukraine"
+    if (isLocFocused) return cityDraft; 
+    return toDisplayLocation(location); 
   }, [isLocFocused, cityDraft, location]);
 
   const handleLocationFocus = () => {
     setIsLocFocused(true);
-    setCityDraft(extractCity(location)); // показуємо тільки місто
+    setCityDraft(extractCity(location)); 
   };
 
   const handleLocationBlur = () => {
     setIsLocFocused(false);
 
-    // нормалізуємо значення та фіксуємо store у форматі бекенду
     const storeValue = toStoreLocation(cityDraft);
-    setCityDraft(extractCity(storeValue)); // лишаємо тільки місто
+    setCityDraft(extractCity(storeValue)); 
     setLocation(storeValue);
   };
 
@@ -97,7 +94,6 @@ export default function Filters() {
     const city = capitalizeFirst(extractCity(value));
     setCityDraft(city);
 
-    // одразу тримаємо store у форматі бекенду (для коректної фільтрації)
     setLocation(city ? `${STORE_PREFIX}${city}` : '');
   };
 

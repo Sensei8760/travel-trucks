@@ -50,10 +50,8 @@ line-height: 150%;
 
 .locationInput::placeholder {
     color: var(--gray);
-    /* empty state */
 }
 
-/* filled state — як на 2 скріні */
 .filled .locationIcon {
     color: var(--main);
 }

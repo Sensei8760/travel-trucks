@@ -33,7 +33,6 @@
     border-radius: 2px;
 }
 
-/* ✅ ВАЖЛИВО: права колонка 641px (як у макеті) */
 .layout {
     display: grid;
     grid-template-columns: 631px 641px;
