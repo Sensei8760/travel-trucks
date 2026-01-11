@@ -2,8 +2,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 import api from '@/services/api';
-import { readFile } from 'fs/promises';
-import path from 'path';
 
 type CamperRecord = Record<string, unknown>;
 
@@ -12,21 +10,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function normalizeItems(data: unknown): CamperRecord[] {
-  if (Array.isArray(data)) {
-    return data.filter(isRecord) as CamperRecord[];
-  }
+  if (Array.isArray(data)) return data.filter(isRecord) as CamperRecord[];
 
   if (isRecord(data) && Array.isArray(data.items)) {
-    return data.items.filter(isRecord) as CamperRecord[];
+    return (data.items as unknown[]).filter(isRecord) as CamperRecord[];
   }
 
   return [];
-}
-
-async function readFallback(): Promise<unknown> {
-  const filePath = path.join(process.cwd(), 'data', 'campersFallback.json');
-  const raw = await readFile(filePath, 'utf-8');
-  return JSON.parse(raw) as unknown;
 }
 
 function parseBool(v: string | null): boolean {
@@ -63,7 +53,7 @@ function applyFilters(items: CamperRecord[], searchParams: URLSearchParams): Cam
   return items.filter((c) => {
     if (location) {
       const loc = getString(c, 'location').toLowerCase();
-      if (!loc.includes(location)) return false; // Kyiv -> "Ukraine, Kyiv"
+      if (!loc.includes(location)) return false;
     }
 
     if (form && getString(c, 'form') !== form) return false;
@@ -110,18 +100,14 @@ export async function GET(request: Request) {
   } catch (err: unknown) {
     const status = axios.isAxiosError(err) ? err.response?.status ?? 500 : 500;
 
-    const fallbackRaw = await readFallback();
-    const allItems = normalizeItems(fallbackRaw);
-    const filtered = applyFilters(allItems, filterParams);
-    const paged = applyPagination(filtered, page, limit);
-
+    // Щоб фронт не падав — віддаємо пустий список, але з хедерами для дебагу
     return NextResponse.json(
-      { total: filtered.length, items: paged },
+      { total: 0, items: [] },
       {
         status: 200,
         headers: {
-          'X-Fallback': '1',
           'X-Upstream-Status': String(status),
+          'X-Fallback': '0',
         },
       }
     );
