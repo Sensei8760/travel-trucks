@@ -3,13 +3,15 @@
 }
 
 .container {
-    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
     padding: 0 64px;
 
     display: grid;
-    grid-template-columns: 360px 1fr;
+    grid-template-columns: 360px 888px;
     gap: 64px;
     align-items: start;
+    justify-content: center;
 }
 
 .sidebar {
@@ -17,6 +19,6 @@
 }
 
 .content {
-    width: 100%;
+    width: 888px;
     min-width: 0;
 }
