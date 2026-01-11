@@ -25,13 +25,14 @@ export default function CampersList() {
         ))}
       </ul>
 
-      {!isLoading && campers.length > 0 && (
-        <button className={styles.loadMore} onClick={() => getCampers()}>
-          Load more
-        </button>
-      )}
-
-      {isLoading && <p>Loading...</p>}
+      {/* Кнопка завжди є, просто блокується під час запиту */}
+      <button
+        className={styles.loadMore}
+        onClick={() => getCampers()}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Loading...' : 'Load more'}
+      </button>
     </div>
   );
 }
