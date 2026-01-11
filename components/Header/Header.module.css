@@ -1,5 +1,6 @@
 .header {
     background-color: var(--inputs);
+    border-bottom: 1px solid var(--badges);
 }
 
 .inner {
@@ -12,16 +13,17 @@
 /* ===== Logo ===== */
 .logo {
     margin-left: 64px;
-    font-size: 20px;
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
 }
 
-.logoDark {
-    color: #111111;
-}
-
-.logoLight {
-    color: #6c757d;
+.logoIcon {
+    width: 136px;
+    height: 16px;
+    display: block;
+    --logo-travel: var(--main);
+        --logo-trucks: var(--text);
 }
 
 /* ===== Navigation ===== */
