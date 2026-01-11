@@ -223,3 +223,49 @@
 .hintValue {
     color: var(--gray);
 }
+.toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+
+    min-width: 280px;
+    max-width: 360px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 12px 14px;
+    border-radius: 10px;
+
+    background: var(--white);
+    border: 1px solid var(--gray-light);
+    box-shadow: 0 10px 30px rgba(16, 24, 40, 0.12);
+
+    color: var(--main);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.toastSuccess {
+    border-color: rgba(18, 183, 106, 0.35);
+}
+
+.toastError {
+    border-color: rgba(228, 72, 72, 0.45);
+}
+
+.toastClose {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--gray);
+}
+
+.toastClose:hover {
+    color: var(--main);
+}

@@ -20,14 +20,10 @@ const formatISO = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${p
 
 const monthTitle = (d: Date) => d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
-/**
- * Week starts Monday:
- * JS getDay(): Sun=0 ... Sat=6
- * Monday-start index: (day + 6) % 7
- */
+/** Week starts Monday */
 const startOfWeekMonday = (d: Date) => {
-  const day = d.getDay();
-  const diff = (day + 6) % 7;
+  const day = d.getDay(); // Sun=0
+  const diff = (day + 6) % 7; // Mon=0
   const res = new Date(d);
   res.setDate(d.getDate() - diff);
   return startOfDay(res);
@@ -43,9 +39,13 @@ const endOfWeekSunday = (d: Date) => {
 
 type Cell = { date: Date; inMonth: boolean; disabled: boolean; isToday: boolean };
 
+type ToastState =
+  | { open: false; type: 'success' | 'error'; text: string }
+  | { open: true; type: 'success' | 'error'; text: string };
+
 export default function BookingForm() {
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -54,6 +54,14 @@ export default function BookingForm() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [viewMonth, setViewMonth] = useState<Date>(() => startOfMonth(new Date()));
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [toast, setToast] = useState<ToastState>({
+    open: false,
+    type: 'success',
+    text: '',
+  });
 
   const today = useMemo(() => startOfDay(new Date()), []);
 
@@ -70,7 +78,7 @@ export default function BookingForm() {
     while (cur <= gridEnd) {
       const date = new Date(cur);
       const inMonth = isSameMonth(date, viewMonth);
-      const disabled = startOfDay(date) < today; // only from today
+      const disabled = startOfDay(date) < today;
       const isToday = isSameDay(date, today);
 
       res.push({ date, inMonth, disabled, isToday });
@@ -89,7 +97,7 @@ export default function BookingForm() {
     setIsCalendarOpen(false);
   };
 
-  // ✅ outside click close (fix "opens then instantly closes")
+  // close calendar on outside click (fix "open then close instantly")
   useEffect(() => {
     const onPointerDownCapture = (e: PointerEvent) => {
       if (!isCalendarOpen) return;
@@ -102,21 +110,24 @@ export default function BookingForm() {
     return () => document.removeEventListener('pointerdown', onPointerDownCapture, true);
   }, [isCalendarOpen]);
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !email.trim() || !selectedDate) return;
+  const showToast = (type: 'success' | 'error', text: string) => {
+    setToast({ open: true, type, text });
 
-    alert('Booking successful!');
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
 
-    setName('');
-    setEmail('');
-    setComment('');
-    setSelectedDate(null);
-    setIsCalendarOpen(false);
-    setViewMonth(startOfMonth(new Date()));
+    toastTimerRef.current = window.setTimeout(() => {
+      setToast((t) => ({ ...t, open: false }));
+      toastTimerRef.current = null;
+    }, 2800);
   };
 
-  // ✅ hint inside Booking date field
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  // hint inside Booking date field
   const isHintShown = isCalendarOpen && !selectedDate;
 
   const bookingValue = selectedDate
@@ -125,12 +136,75 @@ export default function BookingForm() {
       ? 'Select a date between today'
       : '';
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    if (!name.trim() || !email.trim() || !selectedDate) {
+      showToast('error', 'Please fill in all required fields.');
+      return;
+    }
+
+    const payload = {
+      name: name.trim(),
+      email: email.trim(),
+      bookingDate: formatISO(selectedDate),
+      comment: comment.trim(),
+    };
+
+    // ✅ лог у консоль (те, чого тобі не вистачало)
+    console.log('[BookingForm] submit payload:', payload);
+
+    try {
+      setIsSubmitting(true);
+
+      // Тут буде реальний POST на бекенд, якщо він зʼявиться.
+      // Поки що — імітація запиту:
+      await new Promise((r) => setTimeout(r, 500));
+
+      showToast('success', 'Booking successful!');
+      console.log('[BookingForm] booking success');
+
+      // reset
+      setName('');
+      setEmail('');
+      setComment('');
+      setSelectedDate(null);
+      setIsCalendarOpen(false);
+      setViewMonth(startOfMonth(new Date()));
+    } catch (err) {
+      console.error('[BookingForm] booking error:', err);
+      showToast('error', 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div ref={rootRef} className={styles.card}>
+      {/* ✅ toast */}
+      {toast.open && (
+        <div
+          className={`${styles.toast} ${toast.type === 'success' ? styles.toastSuccess : styles.toastError}`}
+          role="status"
+          aria-live="polite"
+        >
+          <span>{toast.text}</span>
+          <button
+            type="button"
+            className={styles.toastClose}
+            aria-label="Close notification"
+            onClick={() => setToast((t) => ({ ...t, open: false }))}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <h3 className={styles.title}>Book your campervan now</h3>
       <p className={styles.subtitle}>Stay connected! We are always ready to help you.</p>
 
-      <form className={styles.form} onSubmit={onSubmit}>
+      <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.fields}>
           <input
             className={styles.input}
@@ -152,7 +226,6 @@ export default function BookingForm() {
 
           <div className={styles.dateField}>
             <input
-              ref={inputRef}
               className={`${styles.input} ${isHintShown ? styles.hintValue : ''}`}
               type="text"
               placeholder="Booking date*"
@@ -185,12 +258,7 @@ export default function BookingForm() {
 
                   <div className={styles.calTitle}>{monthTitle(viewMonth)}</div>
 
-                  <button
-                    type="button"
-                    className={styles.calNav}
-                    onClick={goNextMonth}
-                    aria-label="Next month"
-                  >
+                  <button type="button" className={styles.calNav} onClick={goNextMonth} aria-label="Next month">
                     ›
                   </button>
                 </div>
@@ -241,8 +309,8 @@ export default function BookingForm() {
           />
         </div>
 
-        <button className={styles.send} type="submit">
-          Send
+        <button className={styles.send} type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Sending...' : 'Send'}
         </button>
       </form>
     </div>
