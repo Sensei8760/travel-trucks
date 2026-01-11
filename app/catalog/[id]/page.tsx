@@ -1,4 +1,3 @@
-// app/catalog/[id]/page.tsx
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { readFile } from 'fs/promises';
@@ -6,7 +5,6 @@ import path from 'path';
 
 import api from '@/services/api';
 import type { Camper } from '@/types/camper';
-import { formatPrice } from '@/utils/formatPrice';
 
 import CamperTabs from '@/components/CamperTabs/CamperTabs';
 import BookingForm from '@/components/BookingForm/BookingForm';
@@ -34,15 +32,12 @@ async function readFallback(): Promise<unknown> {
 }
 
 async function getCamperById(id: string): Promise<Camper | null> {
-  // 1) пробуємо бекенд /campers/:id
   try {
     const { data } = await api.get(`/campers/${id}`);
     if (isRecord(data)) return data as unknown as Camper;
   } catch {
-    // ignore -> fallback
   }
 
-  // 2) fallback: локальний json
   const fallbackRaw = await readFallback();
   const items = normalizeItems(fallbackRaw);
   const found = items.find((c) => c.id === id);
@@ -51,7 +46,6 @@ async function getCamperById(id: string): Promise<Camper | null> {
 }
 
 function prettifyLocation(location: string) {
-  // "Ukraine, Kyiv" -> "Kyiv, Ukraine"
   const parts = location
     .split(',')
     .map((s) => s.trim())
@@ -114,7 +108,7 @@ export default async function CamperDetailsPage({
           </div>
         </div>
 
-        <p className={styles.price}>€{formatPrice(camper.price)}</p>
+        <p className={styles.price}>€{Math.trunc(Number(camper.price))}</p>
 
         <div className={styles.gallery}>
           {galleryUrls.map((src, idx) => (
@@ -134,7 +128,6 @@ export default async function CamperDetailsPage({
 
         <p className={styles.description}>{camper.description}</p>
 
-        {/* ✅ Tabs + дві колонки (ліва контент, права booking) */}
         <CamperTabs camper={camper} aside={<BookingForm />} />
       </div>
     </section>

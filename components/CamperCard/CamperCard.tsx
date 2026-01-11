@@ -157,7 +157,7 @@ export default function CamperCard({ camper }: CamperCardProps) {
           <h3 className={styles.title}>{name}</h3>
 
           <div className={styles.rightTop}>
-            <span className={styles.price}>€{Number(price).toFixed(2)}</span>
+            <span className={styles.price}>€{Math.trunc(Number(price))}</span>
 
             <button
               type="button"
