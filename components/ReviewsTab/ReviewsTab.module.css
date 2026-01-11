@@ -8,8 +8,6 @@
     gap: 44px;
 }
 
-.item {}
-
 .header {
     display: flex;
     align-items: flex-start;

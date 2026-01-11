@@ -3,129 +3,138 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './BookingForm.module.css';
 
-type CalendarCell = {
-  date: Date;
-  inMonth: boolean;
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const startOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth(), 1);
+const endOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0);
+const addMonths = (d: Date, delta: number) => new Date(d.getFullYear(), d.getMonth() + delta, 1);
+
+const isSameDay = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+const isSameMonth = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
+
+const formatISO = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+
+const monthTitle = (d: Date) => d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+/**
+ * Week starts Monday:
+ * JS getDay(): Sun=0 ... Sat=6
+ * Monday-start index: (day + 6) % 7
+ */
+const startOfWeekMonday = (d: Date) => {
+  const day = d.getDay();
+  const diff = (day + 6) % 7;
+  const res = new Date(d);
+  res.setDate(d.getDate() - diff);
+  return startOfDay(res);
 };
 
-function startOfMonth(d: Date) {
-  return new Date(d.getFullYear(), d.getMonth(), 1);
-}
+const endOfWeekSunday = (d: Date) => {
+  const day = d.getDay(); // Sun=0
+  const add = (7 - day) % 7;
+  const res = new Date(d);
+  res.setDate(d.getDate() + add);
+  return startOfDay(res);
+};
 
-// Monday-first index: Mon=0 ... Sun=6
-function weekdayIndexMonFirst(d: Date) {
-  return (d.getDay() + 6) % 7;
-}
-
-function isSameDay(a: Date, b: Date) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
-
-function pad2(n: number) {
-  return String(n).padStart(2, '0');
-}
-
-function formatISO(d: Date) {
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-}
-
-function monthTitle(d: Date) {
-  return d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-}
-
-function buildCalendar(monthDate: Date): CalendarCell[] {
-  const first = startOfMonth(monthDate);
-  const shift = weekdayIndexMonFirst(first);
-  const gridStart = new Date(first);
-  gridStart.setDate(first.getDate() - shift);
-
-  const cells: CalendarCell[] = [];
-  for (let i = 0; i < 42; i++) {
-    const day = new Date(gridStart);
-    day.setDate(gridStart.getDate() + i);
-
-    cells.push({
-      date: day,
-      inMonth: day.getMonth() === first.getMonth(),
-    });
-  }
-  return cells;
-}
+type Cell = { date: Date; inMonth: boolean; disabled: boolean; isToday: boolean };
 
 export default function BookingForm() {
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [comment, setComment] = useState('');
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [viewMonth, setViewMonth] = useState<Date>(() => startOfMonth(new Date()));
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  const cells = useMemo(() => buildCalendar(viewMonth), [viewMonth]);
+  const today = useMemo(() => startOfDay(new Date()), []);
 
-  useEffect(() => {
-    if (!isCalendarOpen) return;
+  const cells: Cell[] = useMemo(() => {
+    const mStart = startOfMonth(viewMonth);
+    const mEnd = endOfMonth(viewMonth);
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsCalendarOpen(false);
-    };
+    const gridStart = startOfWeekMonday(mStart);
+    const gridEnd = endOfWeekSunday(mEnd);
 
-    const onMouseDown = (e: MouseEvent) => {
-      if (!rootRef.current) return;
-      if (!rootRef.current.contains(e.target as Node)) setIsCalendarOpen(false);
-    };
+    const res: Cell[] = [];
+    const cur = new Date(gridStart);
 
-    document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('mousedown', onMouseDown);
+    while (cur <= gridEnd) {
+      const date = new Date(cur);
+      const inMonth = isSameMonth(date, viewMonth);
+      const disabled = startOfDay(date) < today; // only from today
+      const isToday = isSameDay(date, today);
 
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-      document.removeEventListener('mousedown', onMouseDown);
-    };
-  }, [isCalendarOpen]);
+      res.push({ date, inMonth, disabled, isToday });
+      cur.setDate(cur.getDate() + 1);
+    }
 
-  const dateValue = selectedDate ? formatISO(selectedDate) : '';
+    return res;
+  }, [viewMonth, today]);
 
-  const goPrevMonth = () => {
-    setViewMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
-  };
+  const goPrevMonth = () => setViewMonth((d) => addMonths(d, -1));
+  const goNextMonth = () => setViewMonth((d) => addMonths(d, 1));
 
-  const goNextMonth = () => {
-    setViewMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
-  };
-
-  const onPick = (d: Date) => {
+  const onPickDate = (d: Date) => {
+    if (startOfDay(d) < today) return;
     setSelectedDate(d);
     setIsCalendarOpen(false);
   };
 
+  // ✅ outside click close (fix "opens then instantly closes")
+  useEffect(() => {
+    const onPointerDownCapture = (e: PointerEvent) => {
+      if (!isCalendarOpen) return;
+      const root = rootRef.current;
+      if (!root) return;
+      if (!root.contains(e.target as Node)) setIsCalendarOpen(false);
+    };
+
+    document.addEventListener('pointerdown', onPointerDownCapture, true);
+    return () => document.removeEventListener('pointerdown', onPointerDownCapture, true);
+  }, [isCalendarOpen]);
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    window.alert('Booking request sent!');
+    if (!name.trim() || !email.trim() || !selectedDate) return;
+
+    alert('Booking successful!');
+
     setName('');
     setEmail('');
     setComment('');
     setSelectedDate(null);
+    setIsCalendarOpen(false);
+    setViewMonth(startOfMonth(new Date()));
   };
 
+  // ✅ hint inside Booking date field
+  const isHintShown = isCalendarOpen && !selectedDate;
+
+  const bookingValue = selectedDate
+    ? formatISO(selectedDate)
+    : isCalendarOpen
+      ? 'Select a date between today'
+      : '';
+
   return (
-    <div className={styles.card} ref={rootRef}>
+    <div ref={rootRef} className={styles.card}>
       <h3 className={styles.title}>Book your campervan now</h3>
-      <p className={styles.subtitle}>
-        Stay connected! We are always ready to help you.
-      </p>
+      <p className={styles.subtitle}>Stay connected! We are always ready to help you.</p>
 
       <form className={styles.form} onSubmit={onSubmit}>
-        {/* ✅ ширина 527px як у макеті */}
         <div className={styles.fields}>
           <input
             className={styles.input}
+            type="text"
             placeholder="Name*"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -134,6 +143,7 @@ export default function BookingForm() {
 
           <input
             className={styles.input}
+            type="email"
             placeholder="Email*"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -142,17 +152,27 @@ export default function BookingForm() {
 
           <div className={styles.dateField}>
             <input
-              className={styles.input}
+              ref={inputRef}
+              className={`${styles.input} ${isHintShown ? styles.hintValue : ''}`}
+              type="text"
               placeholder="Booking date*"
-              value={dateValue}
+              value={bookingValue}
               readOnly
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setIsCalendarOpen(true);
+              }}
               onFocus={() => setIsCalendarOpen(true)}
-              onClick={() => setIsCalendarOpen(true)}
               required
             />
 
             {isCalendarOpen && (
-              <div className={styles.calendar} role="dialog" aria-label="Calendar">
+              <div
+                className={styles.calendar}
+                role="dialog"
+                aria-label="Choose booking date"
+                onPointerDown={(e) => e.stopPropagation()}
+              >
                 <div className={styles.calHeader}>
                   <button
                     type="button"
@@ -176,28 +196,33 @@ export default function BookingForm() {
                 </div>
 
                 <div className={styles.weekdays}>
-                  <span>MON</span>
-                  <span>TUE</span>
-                  <span>WED</span>
-                  <span>THU</span>
-                  <span>FRI</span>
-                  <span>SAT</span>
-                  <span>SUN</span>
+                  <div>MON</div>
+                  <div>TUE</div>
+                  <div>WED</div>
+                  <div>THU</div>
+                  <div>FRI</div>
+                  <div>SAT</div>
+                  <div>SUN</div>
                 </div>
 
                 <div className={styles.grid}>
                   {cells.map((cell) => {
-                    const active =
-                      selectedDate && isSameDay(selectedDate, cell.date);
+                    const isSelected = selectedDate ? isSameDay(cell.date, selectedDate) : false;
 
                     return (
                       <button
                         key={cell.date.toISOString()}
                         type="button"
-                        className={`${styles.day} ${
-                          cell.inMonth ? styles.inMonth : styles.outMonth
-                        } ${active ? styles.selected : ''}`}
-                        onClick={() => onPick(cell.date)}
+                        className={[
+                          styles.day,
+                          cell.inMonth ? styles.inMonth : styles.outMonth,
+                          cell.isToday ? styles.today : '',
+                          isSelected ? styles.selected : '',
+                          cell.disabled ? styles.disabled : '',
+                        ].join(' ')}
+                        onClick={() => onPickDate(cell.date)}
+                        disabled={cell.disabled}
+                        aria-pressed={isSelected}
                       >
                         {cell.date.getDate()}
                       </button>
