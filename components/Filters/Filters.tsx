@@ -1,7 +1,9 @@
+// components/Filters/Filters.tsx
 'use client';
 
 import styles from './Filters.module.css';
 import { useFiltersStore, type EquipmentKey, type VehicleType } from '@/store/filtersStore';
+import { useCampersStore } from '@/store/campersStore';
 
 export default function Filters() {
   const {
@@ -12,6 +14,8 @@ export default function Filters() {
     vehicleType,
     setVehicleType,
   } = useFiltersStore();
+
+  const getCampers = useCampersStore((s) => s.getCampers);
 
   const isActiveEquipment = (key: EquipmentKey) => equipment[key];
   const isActiveType = (type: VehicleType) => vehicleType === type;
@@ -24,11 +28,7 @@ export default function Filters() {
           Location
         </label>
 
-        <div
-          className={`${styles.locationField} ${
-            location.trim() ? styles.filled : ''
-          }`}
-        >
+        <div className={`${styles.locationField} ${location.trim() ? styles.filled : ''}`}>
           <svg className={styles.locationIcon} aria-hidden="true">
             <use href="/icons/sprite.svg#icon-Map" />
           </svg>
@@ -54,9 +54,7 @@ export default function Filters() {
         <div className={styles.grid}>
           <button
             type="button"
-            className={`${styles.option} ${
-              isActiveEquipment('AC') ? styles.active : ''
-            }`}
+            className={`${styles.option} ${isActiveEquipment('AC') ? styles.active : ''}`}
             onClick={() => toggleEquipment('AC')}
           >
             <svg aria-hidden="true">
@@ -67,9 +65,7 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${
-              isActiveEquipment('automatic') ? styles.active : ''
-            }`}
+            className={`${styles.option} ${isActiveEquipment('automatic') ? styles.active : ''}`}
             onClick={() => toggleEquipment('automatic')}
           >
             <svg aria-hidden="true">
@@ -80,9 +76,7 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${
-              isActiveEquipment('kitchen') ? styles.active : ''
-            }`}
+            className={`${styles.option} ${isActiveEquipment('kitchen') ? styles.active : ''}`}
             onClick={() => toggleEquipment('kitchen')}
           >
             <svg aria-hidden="true">
@@ -93,9 +87,7 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${
-              isActiveEquipment('TV') ? styles.active : ''
-            }`}
+            className={`${styles.option} ${isActiveEquipment('TV') ? styles.active : ''}`}
             onClick={() => toggleEquipment('TV')}
           >
             <svg aria-hidden="true">
@@ -106,9 +98,7 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${
-              isActiveEquipment('bathroom') ? styles.active : ''
-            }`}
+            className={`${styles.option} ${isActiveEquipment('bathroom') ? styles.active : ''}`}
             onClick={() => toggleEquipment('bathroom')}
           >
             <svg aria-hidden="true">
@@ -138,12 +128,8 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${
-              isActiveType('fullyIntegrated') ? styles.active : ''
-            }`}
-            onClick={() =>
-              setVehicleType(isActiveType('fullyIntegrated') ? null : 'fullyIntegrated')
-            }
+            className={`${styles.option} ${isActiveType('fullyIntegrated') ? styles.active : ''}`}
+            onClick={() => setVehicleType(isActiveType('fullyIntegrated') ? null : 'fullyIntegrated')}
           >
             <svg aria-hidden="true">
               <use href="/icons/sprite.svg#icon-bi_grid" />
@@ -153,9 +139,7 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${
-              isActiveType('alcove') ? styles.active : ''
-            }`}
+            className={`${styles.option} ${isActiveType('alcove') ? styles.active : ''}`}
             onClick={() => setVehicleType(isActiveType('alcove') ? null : 'alcove')}
           >
             <svg aria-hidden="true">
@@ -166,7 +150,7 @@ export default function Filters() {
         </div>
       </div>
 
-      <button type="button" className={styles.search}>
+      <button type="button" className={styles.search} onClick={() => getCampers(true)}>
         Search
       </button>
     </aside>

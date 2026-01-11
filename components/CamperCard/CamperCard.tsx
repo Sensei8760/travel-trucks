@@ -1,10 +1,12 @@
+// components/CamperCard/CamperCard.tsx
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './CamperCard.module.css';
 import type { Camper } from '@/types/camper';
+import { useFavoritesStore } from '@/store/favoritesStore';
 
 type CamperCardProps = {
   camper: Camper;
@@ -26,7 +28,6 @@ const getFirstImageSrc = (gallery?: Camper['gallery']) => {
   const first = gallery?.[0];
 
   if (!first) return '/placeholder.jpg';
-
   if (typeof first === 'string') return first.trim() || '/placeholder.jpg';
 
   const original = first.original?.trim();
@@ -67,8 +68,8 @@ export default function CamperCard({ camper }: CamperCardProps) {
 
   const imageSrc = getFirstImageSrc(gallery);
 
-  // ✅ тимчасово локальний стан (пізніше підключимо до Zustand + localStorage)
-  const [fav, setFav] = useState(false);
+  const isFav = useFavoritesStore((s) => s.ids.includes(id));
+  const toggleFavorite = useFavoritesStore((s) => s.toggleFavorite);
 
   const badges: Badge[] = useMemo(() => {
     const list: Badge[] = [];
@@ -160,13 +161,12 @@ export default function CamperCard({ camper }: CamperCardProps) {
 
             <button
               type="button"
-              className={`${styles.favBtn} ${fav ? styles.favBtnActive : ''}`}
-              aria-label={fav ? 'Remove from favorites' : 'Add to favorites'}
-              aria-pressed={fav}
-              onClick={() => setFav((v) => !v)}
+              className={`${styles.favBtn} ${isFav ? styles.favBtnActive : ''}`}
+              aria-label={isFav ? 'Remove from favorites' : 'Add to favorites'}
+              aria-pressed={isFav}
+              onClick={() => toggleFavorite(id)}
             >
               <svg className={styles.heartIcon} aria-hidden="true">
-                {/* ✅ ПЕРЕВІР: якщо в спрайті інший id — заміни тут */}
                 <use href="/icons/sprite.svg#icon-Property-1Default" />
               </svg>
             </button>

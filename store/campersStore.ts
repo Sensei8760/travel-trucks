@@ -9,16 +9,35 @@ interface CampersState {
   isLoading: boolean;
   page: number;
 
+  activeQueryKey: string;
+
   getCampers: (reset?: boolean) => Promise<void>;
+}
+
+function makeQueryKey() {
+  const { location, vehicleType, equipment } = useFiltersStore.getState();
+  return JSON.stringify({
+    location: location.trim().toLowerCase(),
+    vehicleType,
+    equipment,
+  });
 }
 
 export const useCampersStore = create<CampersState>((set, get) => ({
   campers: [],
   isLoading: false,
   page: 1,
+  activeQueryKey: '',
 
   getCampers: async (reset = false) => {
     if (get().isLoading) return;
+
+    const newKey = makeQueryKey();
+
+    // якщо фільтри змінилися — мусимо скинути попередні результати
+    if (!reset && get().activeQueryKey && get().activeQueryKey !== newKey) {
+      reset = true;
+    }
 
     const page = reset ? 1 : get().page;
 
@@ -57,6 +76,7 @@ export const useCampersStore = create<CampersState>((set, get) => ({
         campers: reset ? data : [...state.campers, ...data],
         page: page + 1,
         isLoading: false,
+        activeQueryKey: newKey,
       }));
     } catch (e) {
       console.error(e);
