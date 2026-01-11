@@ -108,7 +108,7 @@ export default async function CamperDetailsPage({
           </div>
         </div>
 
-        <p className={styles.price}>€{Math.trunc(Number(camper.price))}</p>
+        <p className={styles.price}>€{Number(camper.price).toFixed(2)}</p>
 
         <div className={styles.gallery}>
           {galleryUrls.map((src, idx) => (
