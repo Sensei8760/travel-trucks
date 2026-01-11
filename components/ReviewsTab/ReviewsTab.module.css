@@ -1,0 +1,89 @@
+.list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+}
+
+.item {
+    /* без карточки — як в макеті (чистий список) */
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--badges);
+    color: var(--button);
+
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.name {
+    margin: 0;
+    color: var(--main);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.star {
+    width: 16px;
+    height: 16px;
+}
+
+.filled {
+    color: var(--rating);
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+.emptyStar {
+    color: var(--gray-light);
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+.comment {
+    margin: 0;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.empty {
+    margin: 0;
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.5;
+}

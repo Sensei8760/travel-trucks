@@ -1,0 +1,84 @@
+.card {
+    width: 100%;
+    border-radius: 10px;
+    background: var(--inputs);
+    padding: 44px 52px;
+}
+
+.badges {
+    margin: 0 0 100px 0;
+    padding: 0;
+    list-style: none;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 12px 18px;
+    border-radius: 100px;
+    background: var(--badges);
+
+    color: var(--main);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+.badgeIcon {
+    width: 20px;
+    height: 20px;
+    color: currentColor;
+    fill: none;
+    stroke: currentColor;
+}
+
+.badgeText {
+    white-space: nowrap;
+}
+
+.detailsTitle {
+    margin: 0 0 24px 0;
+    color: var(--main);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.divider {
+    height: 1px;
+    background: var(--gray-light);
+    margin-bottom: 24px;
+}
+
+.details {
+    margin: 0;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.row dt,
+.row dd {
+    margin: 0;
+    color: var(--main);
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.row dt {
+    font-weight: 400;
+}
+
+.row dd {
+    font-weight: 500;
+}

@@ -7,6 +7,7 @@ import api from '@/services/api';
 import type { Camper } from '@/types/camper';
 import { formatPrice } from '@/utils/formatPrice';
 import styles from './page.module.css';
+import CamperTabs from '@/components/CamperTabs/CamperTabs';
 
 type CamperRecord = Record<string, unknown>;
 
@@ -122,7 +123,8 @@ export default async function CamperDetailsPage({
           ))}
         </div>
 
-        <p className={styles.description}>{camper.description}</p>
+              <p className={styles.description}>{camper.description}</p>
+              <CamperTabs camper={camper} />
       </div>
     </section>
   );
