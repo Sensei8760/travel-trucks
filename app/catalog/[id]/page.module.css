@@ -20,7 +20,7 @@
 .price {
     font-size: 24px;
     font-weight: 600;
-line-height: 133%;
+    line-height: 133%;
     color: var(--main);
     white-space: nowrap;
     margin: 0 0 28px 0;
@@ -110,4 +110,25 @@ line-height: 133%;
     font-weight: 400;
     line-height: 1.5;
     color: var(--text);
+}
+
+/* ✅ КОЛОНКИ як у макеті (ліва 631px, права 448px) */
+.columns {
+    margin-top: 60px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    column-gap: 40px;
+}
+
+.leftCol {
+    width: 631px;
+    min-width: 631px;
+}
+
+.rightCol {
+    width: 448px;
+    flex: 0 0 448px;
 }

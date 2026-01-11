@@ -6,13 +6,14 @@ import FeaturesTab from '@/components/FeaturesTab/FeaturesTab';
 import ReviewsTab from '@/components/ReviewsTab/ReviewsTab';
 import styles from './CamperTabs.module.css';
 
-type Props = {
-  camper: Camper;
-};
-
 type TabKey = 'features' | 'reviews';
 
-export default function CamperTabs({ camper }: Props) {
+type Props = {
+  camper: Camper;
+  aside?: React.ReactNode; // ✅ сюди передамо BookingForm
+};
+
+export default function CamperTabs({ camper, aside }: Props) {
   const [active, setActive] = useState<TabKey>('features');
 
   return (
@@ -35,12 +36,16 @@ export default function CamperTabs({ camper }: Props) {
         </button>
       </div>
 
-      <div className={styles.panel}>
-        {active === 'features' ? (
-          <FeaturesTab camper={camper} />
-        ) : (
-          <ReviewsTab reviews={camper.reviews ?? []} />
-        )}
+      <div className={styles.layout}>
+        <div className={styles.panel}>
+          {active === 'features' ? (
+            <FeaturesTab camper={camper} />
+          ) : (
+            <ReviewsTab reviews={camper.reviews ?? []} />
+          )}
+        </div>
+
+        {aside ? <aside className={styles.aside}>{aside}</aside> : null}
       </div>
     </section>
   );

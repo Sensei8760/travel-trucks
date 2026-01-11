@@ -1,3 +1,9 @@
+.card {
+    background: var(--inputs);
+    border-radius: 10px;
+    padding: 44px;
+}
+
 .list {
     margin: 0;
     padding: 0;
@@ -8,9 +14,7 @@
     gap: 44px;
 }
 
-.item {
-    /* без карточки — як в макеті (чистий список) */
-}
+.item {}
 
 .header {
     display: flex;

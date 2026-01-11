@@ -1,3 +1,4 @@
+// app/catalog/[id]/page.tsx
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { readFile } from 'fs/promises';
@@ -6,8 +7,11 @@ import path from 'path';
 import api from '@/services/api';
 import type { Camper } from '@/types/camper';
 import { formatPrice } from '@/utils/formatPrice';
-import styles from './page.module.css';
+
 import CamperTabs from '@/components/CamperTabs/CamperTabs';
+import BookingForm from '@/components/BookingForm/BookingForm';
+
+import styles from './page.module.css';
 
 type CamperRecord = Record<string, unknown>;
 
@@ -30,19 +34,24 @@ async function readFallback(): Promise<unknown> {
 }
 
 async function getCamperById(id: string): Promise<Camper | null> {
+  // 1) пробуємо бекенд /campers/:id
   try {
     const { data } = await api.get(`/campers/${id}`);
     if (isRecord(data)) return data as unknown as Camper;
   } catch {
+    // ignore -> fallback
   }
 
+  // 2) fallback: локальний json
   const fallbackRaw = await readFallback();
   const items = normalizeItems(fallbackRaw);
   const found = items.find((c) => c.id === id);
+
   return found ? (found as unknown as Camper) : null;
 }
 
 function prettifyLocation(location: string) {
+  // "Ukraine, Kyiv" -> "Kyiv, Ukraine"
   const parts = location
     .split(',')
     .map((s) => s.trim())
@@ -55,18 +64,17 @@ function prettifyLocation(location: string) {
 function getGalleryUrls(camper: Camper): string[] {
   const gallery = camper.gallery ?? [];
 
-  const urls = gallery
+  return gallery
     .map((item) => {
       if (typeof item === 'string') return item.trim();
 
-      const original = typeof item.original === 'string' ? item.original.trim() : '';
+      const original =
+        typeof item.original === 'string' ? item.original.trim() : '';
       const thumb = typeof item.thumb === 'string' ? item.thumb.trim() : '';
 
       return original || thumb;
     })
     .filter((u): u is string => Boolean(u));
-
-  return urls;
 }
 
 export default async function CamperDetailsPage({
@@ -88,24 +96,25 @@ export default async function CamperDetailsPage({
       <div className={styles.container}>
         <h1 className={styles.title}>{camper.name}</h1>
 
-<div className={styles.metaRow}>
-  <div className={styles.ratingWrap}>
-    <svg className={styles.star} aria-hidden="true">
-      <use href="/icons/sprite.svg#icon-Property-1Default-1" />
-    </svg>
-    <span className={styles.rating}>{camper.rating.toFixed(1)}</span>
-    <span className={styles.reviews}>({reviewsCount} Reviews)</span>
-  </div>
+        <div className={styles.metaRow}>
+          <div className={styles.ratingWrap}>
+            <svg className={styles.star} aria-hidden="true">
+              <use href="/icons/sprite.svg#icon-Property-1Default-1" />
+            </svg>
 
-  <div className={styles.locationWrap}>
-    <svg className={styles.map} aria-hidden="true">
-      <use href="/icons/sprite.svg#icon-Map" />
-    </svg>
-    <span className={styles.location}>{locationPretty}</span>
-  </div>
-</div>
+            <span className={styles.rating}>{camper.rating.toFixed(1)}</span>
+            <span className={styles.reviews}>({reviewsCount} Reviews)</span>
+          </div>
 
-<p className={styles.price}>€{formatPrice(camper.price)}</p>
+          <div className={styles.locationWrap}>
+            <svg className={styles.map} aria-hidden="true">
+              <use href="/icons/sprite.svg#icon-Map" />
+            </svg>
+            <span className={styles.location}>{locationPretty}</span>
+          </div>
+        </div>
+
+        <p className={styles.price}>€{formatPrice(camper.price)}</p>
 
         <div className={styles.gallery}>
           {galleryUrls.map((src, idx) => (
@@ -123,8 +132,10 @@ export default async function CamperDetailsPage({
           ))}
         </div>
 
-              <p className={styles.description}>{camper.description}</p>
-              <CamperTabs camper={camper} />
+        <p className={styles.description}>{camper.description}</p>
+
+        {/* ✅ Tabs + дві колонки (ліва контент, права booking) */}
+        <CamperTabs camper={camper} aside={<BookingForm />} />
       </div>
     </section>
   );

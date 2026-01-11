@@ -1,0 +1,109 @@
+.card {
+    width: 100%;
+    box-sizing: border-box;
+
+    background: var(--white);
+    border: 1px solid var(--gray-light);
+    border-radius: 10px;
+
+    padding: 44px 57px;
+}
+
+.title {
+    margin: 0 0 8px 0;
+    color: var(--main);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.subtitle {
+    margin: 0 0 24px 0;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.fields {
+    width: 527px;
+    /* ✅ тепер влізе, бо card 641px */
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.input {
+    width: 100%;
+    height: 56px;
+
+    border: none;
+    outline: none;
+    border-radius: 10px;
+
+    background: var(--inputs);
+    padding: 18px;
+
+    color: var(--main);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.25;
+}
+
+.input::placeholder {
+    color: var(--gray);
+}
+
+.textarea {
+    height: 114px;
+    resize: none;
+}
+
+.dateField {
+    position: relative;
+}
+
+.calendar {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+
+    width: 276px;
+    background: var(--white);
+    border: 1px solid var(--gray-light);
+    border-radius: 10px;
+
+    padding: 12px;
+    z-index: 20;
+}
+
+.send {
+    width: 166px;
+    height: 56px;
+
+    margin: 24px auto 0;
+
+    border: none;
+    border-radius: 200px;
+    background: var(--button);
+
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+
+    cursor: pointer;
+    transition: background 180ms ease;
+}
+
+.send:hover,
+.send:focus-visible {
+    background: var(--button-hover);
+    outline: none;
+}

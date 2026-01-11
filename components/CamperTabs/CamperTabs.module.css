@@ -33,6 +33,19 @@
     border-radius: 2px;
 }
 
+/* ✅ ВАЖЛИВО: права колонка 641px (як у макеті) */
+.layout {
+    display: grid;
+    grid-template-columns: 631px 641px;
+    gap: 40px;
+    align-items: start;
+}
+
 .panel {
-    /* тут буде 2 колонки пізніше (ліва features/reviews, права booking) */
+    min-width: 0;
+}
+
+.aside {
+    width: 641px;
+    min-width: 641px;
 }
