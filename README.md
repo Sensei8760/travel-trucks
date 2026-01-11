@@ -1,6 +1,6 @@
 # TravelTrucks
 
-Frontend веб-додатку для компанії **TravelTrucks**, яка займається орендою кемперів.  
+Frontend веб-додатк для компанії **TravelTrucks**, яка займається орендою кемперів.  
 Проєкт реалізований на **Next.js (App Router)** з **TypeScript**, стан керується через **Zustand**, запити виконуються через **Axios**, стилі — **CSS Modules**.
 
 ---
