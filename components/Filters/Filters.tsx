@@ -1,9 +1,60 @@
-// components/Filters/Filters.tsx
 'use client';
 
+import { useMemo, useState } from 'react';
 import styles from './Filters.module.css';
-import { useFiltersStore, type EquipmentKey, type VehicleType } from '@/store/filtersStore';
+import {
+  useFiltersStore,
+  type EquipmentKey,
+  type VehicleType,
+} from '@/store/filtersStore';
 import { useCampersStore } from '@/store/campersStore';
+
+const COUNTRY = 'Ukraine';
+const STORE_PREFIX = `${COUNTRY}, `; // "Ukraine, "
+const DISPLAY_SUFFIX = `, ${COUNTRY}`; // ", Ukraine"
+
+const cleanSpaces = (s: string) => s.replace(/\s+/g, ' ').trim();
+
+const capitalizeFirst = (s: string) => {
+  const v = cleanSpaces(s);
+  if (!v) return '';
+  return v.charAt(0).toUpperCase() + v.slice(1);
+};
+
+// дістає місто з будь-якого формату: "Ukraine, Kyiv" або "Kyiv, Ukraine" або "Kyiv"
+const extractCity = (raw: string) => {
+  const s = cleanSpaces(raw);
+  if (!s) return '';
+
+  const lower = s.toLowerCase();
+
+  // "Ukraine, Kyiv"
+  if (lower.startsWith(STORE_PREFIX.toLowerCase())) {
+    return cleanSpaces(s.slice(STORE_PREFIX.length));
+  }
+
+  // "Kyiv, Ukraine"
+  if (lower.endsWith(DISPLAY_SUFFIX.toLowerCase())) {
+    return cleanSpaces(s.slice(0, s.length - DISPLAY_SUFFIX.length));
+  }
+
+  // "Kyiv, something" -> беремо першу частину
+  if (s.includes(',')) return cleanSpaces(s.split(',')[0]);
+
+  return s;
+};
+
+const toStoreLocation = (input: string) => {
+  const city = capitalizeFirst(extractCity(input));
+  if (!city) return '';
+  return `${STORE_PREFIX}${city}`; // "Ukraine, Kyiv"
+};
+
+const toDisplayLocation = (storeLocation: string) => {
+  const city = capitalizeFirst(extractCity(storeLocation));
+  if (!city) return '';
+  return `${city}${DISPLAY_SUFFIX}`; // "Kyiv, Ukraine"
+};
 
 export default function Filters() {
   const {
@@ -20,6 +71,36 @@ export default function Filters() {
   const isActiveEquipment = (key: EquipmentKey) => equipment[key];
   const isActiveType = (type: VehicleType) => vehicleType === type;
 
+  const [isLocFocused, setIsLocFocused] = useState(false);
+  const [cityDraft, setCityDraft] = useState('');
+
+  const displayValue = useMemo(() => {
+    if (isLocFocused) return cityDraft; // тільки місто
+    return toDisplayLocation(location); // "Kyiv, Ukraine"
+  }, [isLocFocused, cityDraft, location]);
+
+  const handleLocationFocus = () => {
+    setIsLocFocused(true);
+    setCityDraft(extractCity(location)); // показуємо тільки місто
+  };
+
+  const handleLocationBlur = () => {
+    setIsLocFocused(false);
+
+    // нормалізуємо значення та фіксуємо store у форматі бекенду
+    const storeValue = toStoreLocation(cityDraft);
+    setCityDraft(extractCity(storeValue)); // лишаємо тільки місто
+    setLocation(storeValue);
+  };
+
+  const handleLocationChange = (value: string) => {
+    const city = capitalizeFirst(extractCity(value));
+    setCityDraft(city);
+
+    // одразу тримаємо store у форматі бекенду (для коректної фільтрації)
+    setLocation(city ? `${STORE_PREFIX}${city}` : '');
+  };
+
   return (
     <aside className={styles.filters}>
       {/* Location */}
@@ -28,7 +109,11 @@ export default function Filters() {
           Location
         </label>
 
-        <div className={`${styles.locationField} ${location.trim() ? styles.filled : ''}`}>
+        <div
+          className={`${styles.locationField} ${
+            location.trim() ? styles.filled : ''
+          }`}
+        >
           <svg className={styles.locationIcon} aria-hidden="true">
             <use href="/icons/sprite.svg#icon-Map" />
           </svg>
@@ -36,14 +121,16 @@ export default function Filters() {
           <input
             id="location"
             className={styles.locationInput}
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            value={displayValue}
+            onFocus={handleLocationFocus}
+            onBlur={handleLocationBlur}
+            onChange={(e) => handleLocationChange(e.target.value)}
             placeholder="City"
+            autoComplete="off"
           />
         </div>
       </div>
 
-      {/* Filters title */}
       <p className={styles.filtersTitle}>Filters</p>
 
       {/* Vehicle equipment */}
@@ -54,7 +141,9 @@ export default function Filters() {
         <div className={styles.grid}>
           <button
             type="button"
-            className={`${styles.option} ${isActiveEquipment('AC') ? styles.active : ''}`}
+            className={`${styles.option} ${
+              isActiveEquipment('AC') ? styles.active : ''
+            }`}
             onClick={() => toggleEquipment('AC')}
           >
             <svg aria-hidden="true">
@@ -65,7 +154,9 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${isActiveEquipment('automatic') ? styles.active : ''}`}
+            className={`${styles.option} ${
+              isActiveEquipment('automatic') ? styles.active : ''
+            }`}
             onClick={() => toggleEquipment('automatic')}
           >
             <svg aria-hidden="true">
@@ -76,7 +167,9 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${isActiveEquipment('kitchen') ? styles.active : ''}`}
+            className={`${styles.option} ${
+              isActiveEquipment('kitchen') ? styles.active : ''
+            }`}
             onClick={() => toggleEquipment('kitchen')}
           >
             <svg aria-hidden="true">
@@ -87,7 +180,9 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${isActiveEquipment('TV') ? styles.active : ''}`}
+            className={`${styles.option} ${
+              isActiveEquipment('TV') ? styles.active : ''
+            }`}
             onClick={() => toggleEquipment('TV')}
           >
             <svg aria-hidden="true">
@@ -98,7 +193,9 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${isActiveEquipment('bathroom') ? styles.active : ''}`}
+            className={`${styles.option} ${
+              isActiveEquipment('bathroom') ? styles.active : ''
+            }`}
             onClick={() => toggleEquipment('bathroom')}
           >
             <svg aria-hidden="true">
@@ -117,7 +214,9 @@ export default function Filters() {
         <div className={styles.grid}>
           <button
             type="button"
-            className={`${styles.option} ${isActiveType('van') ? styles.active : ''}`}
+            className={`${styles.option} ${
+              isActiveType('van') ? styles.active : ''
+            }`}
             onClick={() => setVehicleType(isActiveType('van') ? null : 'van')}
           >
             <svg aria-hidden="true">
@@ -128,8 +227,14 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${isActiveType('fullyIntegrated') ? styles.active : ''}`}
-            onClick={() => setVehicleType(isActiveType('fullyIntegrated') ? null : 'fullyIntegrated')}
+            className={`${styles.option} ${
+              isActiveType('fullyIntegrated') ? styles.active : ''
+            }`}
+            onClick={() =>
+              setVehicleType(
+                isActiveType('fullyIntegrated') ? null : 'fullyIntegrated'
+              )
+            }
           >
             <svg aria-hidden="true">
               <use href="/icons/sprite.svg#icon-bi_grid" />
@@ -139,8 +244,12 @@ export default function Filters() {
 
           <button
             type="button"
-            className={`${styles.option} ${isActiveType('alcove') ? styles.active : ''}`}
-            onClick={() => setVehicleType(isActiveType('alcove') ? null : 'alcove')}
+            className={`${styles.option} ${
+              isActiveType('alcove') ? styles.active : ''
+            }`}
+            onClick={() =>
+              setVehicleType(isActiveType('alcove') ? null : 'alcove')
+            }
           >
             <svg aria-hidden="true">
               <use href="/icons/sprite.svg#icon-bi_grid-3x3-gap" />
