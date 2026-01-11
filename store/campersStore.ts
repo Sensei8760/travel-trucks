@@ -1,6 +1,8 @@
+// store/campersStore.ts
 import { create } from 'zustand';
 import type { Camper } from '@/types/camper';
-import { fetchCampers } from '@/services/campersApi';
+import { fetchCampers, type FetchCampersParams } from '@/services/campersApi';
+import { useFiltersStore } from '@/store/filtersStore';
 
 interface CampersState {
   campers: Camper[];
@@ -20,10 +22,36 @@ export const useCampersStore = create<CampersState>((set, get) => ({
 
     const page = reset ? 1 : get().page;
 
+    const { location, vehicleType, equipment } = useFiltersStore.getState();
+
+    const form: FetchCampersParams['form'] =
+      vehicleType === 'van'
+        ? 'panelTruck'
+        : vehicleType === 'fullyIntegrated'
+          ? 'fullyIntegrated'
+          : vehicleType === 'alcove'
+            ? 'alcove'
+            : undefined;
+
+    const transmission: FetchCampersParams['transmission'] =
+      equipment.automatic ? 'automatic' : undefined;
+
     set({ isLoading: true });
 
     try {
-      const data = await fetchCampers({ page, limit: 4 });
+      const data = await fetchCampers({
+        page,
+        limit: 4,
+
+        location,
+        form,
+        transmission,
+
+        AC: equipment.AC,
+        kitchen: equipment.kitchen,
+        TV: equipment.TV,
+        bathroom: equipment.bathroom,
+      });
 
       set((state) => ({
         campers: reset ? data : [...state.campers, ...data],
