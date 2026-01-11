@@ -1,5 +1,6 @@
-import type { Camper } from '@/types/camper';
 import styles from './FeaturesTab.module.css';
+import cardStyles from '../CamperCard/CamperCard.module.css';
+import type { Camper } from '@/types/camper';
 
 type Props = {
   camper: Camper;
@@ -11,90 +12,108 @@ type Badge = {
   iconId: string;
 };
 
-function toTitle(s?: string) {
-  if (!s) return '';
-  const str = String(s).toLowerCase();
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function formatForm(form?: string) {
-  if (!form) return '';
-  if (form === 'panelTruck') return 'Panel truck';
-  if (form === 'fullyIntegrated') return 'Fully integrated';
-  if (form === 'alcove') return 'Alcove';
-  return toTitle(form);
-}
-
-function withSpaceUnit(value?: string) {
+const toTitle = (value?: string) => {
   if (!value) return '';
-  // 5.4m -> 5.4 m ; 132l -> 132 l
-  return value.replace(/(\d)([a-zA-Z])/g, '$1 $2');
-}
+  const s = String(value).toLowerCase();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
+const FORM_LABELS: Record<string, string> = {
+  panelTruck: 'Panel truck',
+  fullyIntegrated: 'Fully integrated',
+  alcove: 'Alcove',
+};
+
+// ✅ 1:1 як у CamperCard
+const MIXED_ICON_IDS = new Set<string>([]);
+const FORCE_OUTLINE_ICON_IDS = new Set<string>([
+  'icon-lucide_microwave',
+  'icon-hugeicons_gas-stove',
+  'icon-ion_water-outline',
+]);
 
 export default function FeaturesTab({ camper }: Props) {
-  const badges: Badge[] = [];
+  const badges: Badge[] = [
+    camper.transmission
+      ? {
+          key: 'transmission',
+          label:
+            camper.transmission.toLowerCase() === 'automatic'
+              ? 'Automatic'
+              : toTitle(camper.transmission),
+          iconId: 'icon-diagram',
+        }
+      : null,
 
-  if (camper.transmission) {
-    badges.push({
-      key: 'transmission',
-      label: camper.transmission === 'automatic' ? 'Automatic' : toTitle(camper.transmission),
-      iconId: 'icon-diagram',
-    });
-  }
+    camper.AC ? { key: 'AC', label: 'AC', iconId: 'icon-wind' } : null,
 
-  if (camper.AC) badges.push({ key: 'AC', label: 'AC', iconId: 'icon-wind' });
-  if (camper.engine) badges.push({ key: 'engine', label: toTitle(camper.engine), iconId: 'icon-fuel-pump' });
-  if (camper.kitchen) badges.push({ key: 'kitchen', label: 'Kitchen', iconId: 'icon-cup-hot' });
-  if (camper.radio) badges.push({ key: 'radio', label: 'Radio', iconId: 'icon-ui-radios' });
+    camper.engine
+      ? { key: 'engine', label: toTitle(camper.engine), iconId: 'icon-fuel-pump' }
+      : null,
 
-  // (якщо захочеш — легко додати інші, але на скріні зараз ці)
+    camper.kitchen ? { key: 'kitchen', label: 'Kitchen', iconId: 'icon-cup-hot' } : null,
+    camper.radio ? { key: 'radio', label: 'Radio', iconId: 'icon-ui-radios' } : null,
+    camper.bathroom ? { key: 'bathroom', label: 'Bathroom', iconId: 'icon-ph_shower' } : null,
+
+    camper.refrigerator
+      ? { key: 'refrigerator', label: 'Refrigerator', iconId: 'icon-solar_fridge-outline' }
+      : null,
+
+    camper.microwave
+      ? { key: 'microwave', label: 'Microwave', iconId: 'icon-lucide_microwave' }
+      : null,
+
+    camper.gas ? { key: 'gas', label: 'Gas', iconId: 'icon-hugeicons_gas-stove' } : null,
+
+    camper.water
+      ? { key: 'water', label: 'Water', iconId: 'icon-ion_water-outline' }
+      : null,
+
+    camper.TV ? { key: 'TV', label: 'TV', iconId: 'icon-tv' } : null,
+  ].filter(Boolean) as Badge[];
+
+  const details = [
+    { key: 'form', label: 'Form', value: FORM_LABELS[camper.form ?? ''] ?? camper.form ?? '' },
+    { key: 'length', label: 'Length', value: camper.length },
+    { key: 'width', label: 'Width', value: camper.width },
+    { key: 'height', label: 'Height', value: camper.height },
+    { key: 'tank', label: 'Tank', value: camper.tank },
+    { key: 'consumption', label: 'Consumption', value: camper.consumption },
+  ].filter((d) => Boolean(d.value));
 
   return (
     <div className={styles.card}>
-      <ul className={styles.badges}>
-        {badges.map((b) => (
-          <li key={b.key} className={styles.badge}>
-            <svg className={styles.badgeIcon} aria-hidden="true">
-              <use href={`/icons/sprite.svg#${b.iconId}`} />
-            </svg>
-            <span className={styles.badgeText}>{b.label}</span>
-          </li>
-        ))}
+      <ul className={cardStyles.badges} aria-label="Camper features">
+        {badges.map((b) => {
+          const modeClass = MIXED_ICON_IDS.has(b.iconId)
+            ? cardStyles.badgeIconMixed
+            : cardStyles.badgeIconOutline;
+
+          const finalIconClass = FORCE_OUTLINE_ICON_IDS.has(b.iconId)
+            ? cardStyles.badgeIconForceOutline
+            : modeClass;
+
+          return (
+            <li key={b.key} className={cardStyles.badge}>
+              <svg className={`${cardStyles.badgeIcon} ${finalIconClass}`} aria-hidden="true">
+                <use href={`/icons/sprite.svg#${b.iconId}`} />
+              </svg>
+              <span>{b.label}</span>
+            </li>
+          );
+        })}
       </ul>
 
       <h3 className={styles.detailsTitle}>Vehicle details</h3>
-      <div className={styles.divider} />
+      <div className={styles.line} />
 
       <dl className={styles.details}>
-        <div className={styles.row}>
-          <dt>Form</dt>
-          <dd>{formatForm(camper.form)}</dd>
-        </div>
-
-        <div className={styles.row}>
-          <dt>Length</dt>
-          <dd>{withSpaceUnit(camper.length)}</dd>
-        </div>
-
-        <div className={styles.row}>
-          <dt>Width</dt>
-          <dd>{withSpaceUnit(camper.width)}</dd>
-        </div>
-
-        <div className={styles.row}>
-          <dt>Height</dt>
-          <dd>{withSpaceUnit(camper.height)}</dd>
-        </div>
-
-        <div className={styles.row}>
-          <dt>Tank</dt>
-          <dd>{withSpaceUnit(camper.tank)}</dd>
-        </div>
-
-        <div className={styles.row}>
-          <dt>Consumption</dt>
-          <dd>{camper.consumption}</dd>
-        </div>
+        {details.map((d) => (
+          <div key={d.key} className={styles.detailsRow}>
+            <dt className={styles.detailsKey}>{d.label}</dt>
+            <dd className={styles.detailsValue}>{d.value}</dd>
+          </div>
+        ))}
       </dl>
     </div>
   );
